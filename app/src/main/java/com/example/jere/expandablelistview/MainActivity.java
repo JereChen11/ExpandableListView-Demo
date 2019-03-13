@@ -1,16 +1,19 @@
 package com.example.jere.expandablelistview;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
 
-import com.example.jere.expandablelistview.model.ExpandableListViewChildItem;
-import com.example.jere.expandablelistview.model.ExpandableListViewGroupItem;
-import com.example.jere.expandablelistview.model.ExpandableListViewModel;
+import com.example.jere.expandablelistview.model.ChildItem;
+import com.example.jere.expandablelistview.model.GroupItem;
 
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,44 +24,103 @@ public class MainActivity extends AppCompatActivity {
     private ExpandableListView mExpandableListView;
     private ExpandableListAdapter mExpandableListViewAdapter;
     private ExpandableListViewModel mExpandableListViewModel;
+    private ImageView mSelectAllIV;
+    private Observer<Boolean> selectAllBtnObserver = new Observer<Boolean>() {
+        @Override
+        public void onChanged(@Nullable Boolean aBoolean) {
+            if (aBoolean) {
+                mSelectAllIV.setImageResource(R.drawable.icon_list_selected);
+            } else {
+                mSelectAllIV.setImageResource(R.drawable.icon_list_unselect);
+            }
+            ((MyExpandableListViewAdapter) mExpandableListViewAdapter).notifyDataSetChanged();
+        }
+    };
+
+    private List<Integer> getGroupItemsSelectedIdsList() {
+        List<Integer> groupItemSelectedIdList = new ArrayList<>();
+        if (mExpandableListViewAdapter != null) {
+            for (int i = 0; i < mExpandableListViewAdapter.getGroupCount(); i++) {
+                GroupItem groupItem = (GroupItem) mExpandableListViewAdapter.getGroup(i);
+                if (groupItem.isSelected()) {
+                    groupItemSelectedIdList.add(groupItem.getId());
+                }
+            }
+        } else {
+            List<Integer> emptyList = new ArrayList<>();
+            return emptyList;
+        }
+        return groupItemSelectedIdList;
+    }
+
+    private List<Integer> getChildItemsSelectedIdList() {
+        List<Integer> childItemSelectedIdList = new ArrayList<>();
+        if (mExpandableListViewAdapter != null) {
+            for (int i = 0; i < mExpandableListViewAdapter.getGroupCount(); i++) {
+                GroupItem groupItem = (GroupItem) mExpandableListViewAdapter.getGroup(i);
+                List<ChildItem> secondLevelItemList = groupItem.getChildItemList();
+                for (ChildItem secondLevelItem : secondLevelItemList) {
+                    if (secondLevelItem.isSelected()) {
+                        childItemSelectedIdList.add(secondLevelItem.getId());
+                    }
+                }
+            }
+        } else {
+            List<Integer> emptyList = new ArrayList<>();
+            return emptyList;
+        }
+
+        return childItemSelectedIdList;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mExpandableListViewModel = new ExpandableListViewModel(getApplication());
+        findView();
 
-        mExpandableListView = findViewById(R.id.elv);
+        mExpandableListViewModel = ViewModelProviders.of(this).get(ExpandableListViewModel.class);
+        mExpandableListViewModel.getSelectedAllBtnStatus().observe(this, selectAllBtnObserver);
+        mExpandableListViewModel.initGroupExpandStatusList();
 
-        List<ExpandableListViewGroupItem> groupListData = getDummyGroupListData();
-        HashMap<String, List<ExpandableListViewChildItem>> childMapData = getDummyChildMapData(groupListData);
-        mExpandableListViewAdapter = new MyExpandableListViewAdapter(this, groupListData, childMapData);
+
+        List<GroupItem> groupListData = mExpandableListViewModel.getDummyGroupListData();
+        mExpandableListViewAdapter = new MyExpandableListViewAdapter(this, groupListData, mExpandableListViewModel);
 
         mExpandableListView.setAdapter(mExpandableListViewAdapter);
+
+        mExpandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                List<Boolean> groupExpandStatusList = mExpandableListViewModel.getGroupExpandStatusList().getValue();
+                if (groupExpandStatusList.get(groupPosition)) {
+                    groupExpandStatusList.set(groupPosition, false);
+                } else {
+                    groupExpandStatusList.set(groupPosition, true);
+                }
+                mExpandableListViewModel.setGroupExpandStatusList(groupExpandStatusList);
+                return false;
+            }
+        });
+
+
     }
 
-    public List<ExpandableListViewGroupItem> getDummyGroupListData() {
-        ExpandableListViewGroupItem groupItemOne = new ExpandableListViewGroupItem("Group-Item-One");
-        ExpandableListViewGroupItem groupItemTwo = new ExpandableListViewGroupItem("Group-Item-Two");
-        ExpandableListViewGroupItem groupItemThree = new ExpandableListViewGroupItem("Group-Item-Three");
-        ExpandableListViewGroupItem groupItemFour = new ExpandableListViewGroupItem("Group-Item-Four");
-        ExpandableListViewGroupItem groupItemFive = new ExpandableListViewGroupItem("Group-Item-Five");
-        return Arrays.asList(groupItemOne, groupItemTwo, groupItemThree, groupItemFour, groupItemFive);
+    private void findView() {
+        mExpandableListView = findViewById(R.id.elv);
+        mSelectAllIV = findViewById(R.id.ivSelectAll);
+
+        mSelectAllIV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mExpandableListViewModel.getSelectedAllBtnStatus().getValue()) {
+                    mExpandableListViewModel.setSelectedAllBtnStatus(false);
+                } else {
+                    mExpandableListViewModel.setSelectedAllBtnStatus(true);
+                }
+            }
+        });
     }
 
-    public HashMap<String, List<ExpandableListViewChildItem>> getDummyChildMapData(List<ExpandableListViewGroupItem> groupListData) {
-        HashMap<String, List<ExpandableListViewChildItem>> childMapData = new HashMap<>();
-        for (int i = 0; i < groupListData.size(); i++) {
-            ExpandableListViewChildItem childItemOne = new ExpandableListViewChildItem("Child-Item-One");
-            ExpandableListViewChildItem childItemTwo = new ExpandableListViewChildItem("Child-Item-Two");
-            ExpandableListViewChildItem childItemThree = new ExpandableListViewChildItem("Child-Item-Three");
-
-            List<ExpandableListViewChildItem> childListData = Arrays.asList(childItemOne, childItemTwo, childItemThree);
-
-            String childMapDataKey = groupListData.get(i).getGroupName();
-            childMapData.put(childMapDataKey, childListData);
-        }
-        return childMapData;
-    }
 }

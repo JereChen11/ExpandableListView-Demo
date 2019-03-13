@@ -9,8 +9,8 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.jere.expandablelistview.model.ExpandableListViewChildItem;
-import com.example.jere.expandablelistview.model.ExpandableListViewGroupItem;
+import com.example.jere.expandablelistview.model.ChildItem;
+import com.example.jere.expandablelistview.model.GroupItem;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,14 +20,14 @@ import java.util.List;
  */
 public class MyExpandableListViewAdapter extends BaseExpandableListAdapter {
     private Context mContext;
-    private List<ExpandableListViewGroupItem> mParentListData;
-    private HashMap<String, List<ExpandableListViewChildItem>> mChildMapData;
+    private List<GroupItem> mParentListData;
+    private ExpandableListViewModel mViewModel;
 
-    public MyExpandableListViewAdapter(Context context , @Nullable List<ExpandableListViewGroupItem> groupListData,
-                                       @Nullable HashMap<String, List<ExpandableListViewChildItem>> childMapData) {
+    public MyExpandableListViewAdapter(Context context, @Nullable List<GroupItem> groupListData,
+                                       @Nullable ExpandableListViewModel mExpandableListViewModel) {
         this.mContext = context;
         this.mParentListData = groupListData;
-        this.mChildMapData = childMapData;
+        this.mViewModel = mExpandableListViewModel;
     }
 
     @Override
@@ -37,7 +37,7 @@ public class MyExpandableListViewAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        return mChildMapData.get(mParentListData.get(groupPosition).getGroupName()).size();
+        return mParentListData.get(groupPosition).getChildItemList().size();
     }
 
     @Override
@@ -47,7 +47,7 @@ public class MyExpandableListViewAdapter extends BaseExpandableListAdapter {
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
-        return mChildMapData.get(mParentListData.get(groupPosition).getGroupName()).get(childPosition);
+        return mParentListData.get(groupPosition).getChildItemList().get(childPosition);
     }
 
     @Override
@@ -68,21 +68,40 @@ public class MyExpandableListViewAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 
-        ExpandableListViewGroupItem groupItem = (ExpandableListViewGroupItem) getGroup(groupPosition);
+        GroupItem groupItem = (GroupItem) getGroup(groupPosition);
 
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.elv_group_list_item , null);
         }
         TextView textView = convertView.findViewById(R.id.tvGroupName);
-        textView.setText(groupItem.getGroupName());
+        textView.setText(groupItem.getName());
 
         ImageView ivArrowIcon = convertView.findViewById(R.id.ivGroupArrowIcon);
+        ImageView ivGroupSelectIcon = convertView.findViewById(R.id.ivGroupSelectIcon);
+
+        Boolean selectedAllBtnStatus = mViewModel.getSelectedAllBtnStatus().getValue();
+        if (selectedAllBtnStatus) {
+            groupItem.setSelected(true);
+        }
+
+        if (groupItem.isSelected()) {
+            ivGroupSelectIcon.setImageResource(R.drawable.icon_list_selected);
+        } else {
+            ivGroupSelectIcon.setImageResource(R.drawable.icon_list_unselect);
+        }
+
+        ivGroupSelectIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
         if(isExpanded) {
-            ivArrowIcon.setImageResource(R.mipmap.up_arrow_icon);
+            ivArrowIcon.setImageResource(R.drawable.up_arrow_icon);
         }else{
-            ivArrowIcon.setImageResource(R.mipmap.down_arrow_icon);
+            ivArrowIcon.setImageResource(R.drawable.down_arrow_icon);
         }
 
         return convertView;
@@ -90,7 +109,7 @@ public class MyExpandableListViewAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        ExpandableListViewChildItem childItem = (ExpandableListViewChildItem) getChild(groupPosition, childPosition);
+        ChildItem childItem = (ChildItem) getChild(groupPosition, childPosition);
 
         if(convertView == null) {
             LayoutInflater inflater = (LayoutInflater)this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -98,8 +117,14 @@ public class MyExpandableListViewAdapter extends BaseExpandableListAdapter {
         }
 
         TextView textChild = (TextView)convertView.findViewById(R.id.tvChildName);
-        ImageView mTickImage = (ImageView) convertView.findViewById(R.id.ivChildSelectIcon);
-        textChild.setText(childItem.getChildName());
+        ImageView ivChildSelectIcon = (ImageView) convertView.findViewById(R.id.ivChildSelectIcon);
+        textChild.setText(childItem.getName());
+
+//        if (childItem.isSelected()) {
+//            ivChildSelectIcon.setImageResource(R.drawable.icon_list_selected);
+//        } else {
+//            ivChildSelectIcon.setImageResource(R.drawable.icon_list_unselect);
+//        }
 
         return convertView;
     }
@@ -109,4 +134,8 @@ public class MyExpandableListViewAdapter extends BaseExpandableListAdapter {
         return false;
     }
 
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+    }
 }

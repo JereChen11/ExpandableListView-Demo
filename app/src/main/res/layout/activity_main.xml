@@ -1,18 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:ignore="MissingConstraints"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/rlSelectAll"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="62dp"
+            android:gravity="center_vertical"
+            android:layout_toEndOf="@id/ivChildIcon"
+            android:maxLines="3"
+            android:text="child item name"
+            android:textColor="@color/DarkOrange"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/ivSelectAll"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/icon_list_unselect"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/DarkGray"
+            android:layout_below="@+id/ivSelectAll"
+            />
+
+    </RelativeLayout>
 
     <ExpandableListView
         android:id="@+id/elv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:groupIndicator="@null"
-        >
+        android:childDivider="@color/Beige"
+        app:layout_constraintTop_toBottomOf="@id/rlSelectAll">
 
     </ExpandableListView>
+
 
 </android.support.constraint.ConstraintLayout>

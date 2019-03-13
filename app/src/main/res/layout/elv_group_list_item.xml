@@ -33,7 +33,7 @@
             android:layout_height="26dp"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="5dp"
-            android:src="@mipmap/down_arrow_icon" />
+            android:src="@drawable/down_arrow_icon" />
 
     </LinearLayout>
 
@@ -46,6 +46,6 @@
         android:layout_marginBottom="12dp"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:src="@mipmap/icon_list_unselect" />
+        android:src="@drawable/icon_list_unselect" />
 
 </RelativeLayout>

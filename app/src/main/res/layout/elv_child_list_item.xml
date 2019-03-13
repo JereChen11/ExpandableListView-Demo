@@ -4,8 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="50dp"
     android:layout_marginTop="16dp"
-    android:layout_marginBottom="16dp"
-    android:background="#2DEAC031">
+    android:layout_marginBottom="16dp">
 
     <ImageView
         android:id="@+id/ivChildIcon"
@@ -13,7 +12,7 @@
         android:layout_height="25dp"
         android:src="@drawable/icon_list_service"
         android:layout_centerVertical="true"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="30dp"
         />
 
     <TextView
@@ -26,7 +25,7 @@
         android:layout_toEndOf="@id/ivChildIcon"
         android:maxLines="3"
         android:text="child item name"
-        android:textColor="#ffffff"
+        android:textColor="@color/Black"
         android:textSize="14sp" />
 
     <ImageView
@@ -38,6 +37,6 @@
         android:layout_marginBottom="12dp"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:src="@mipmap/icon_list_unselect"/>
+        android:src="@drawable/icon_list_unselect"/>
 
 </RelativeLayout>
