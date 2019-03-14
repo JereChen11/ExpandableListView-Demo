@@ -14,6 +14,11 @@ import com.example.jere.expandablelistview.model.GroupItem;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+
+import static com.example.jere.expandablelistview.ExpandableListViewModel.NOT_SELECT_ANY;
+import static com.example.jere.expandablelistview.ExpandableListViewModel.SELECT_ALL;
+import static com.example.jere.expandablelistview.ExpandableListViewModel.SELECT_SOME;
 
 /**
  * @author jere
@@ -68,7 +73,7 @@ public class MyExpandableListViewAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 
-        GroupItem groupItem = (GroupItem) getGroup(groupPosition);
+        final GroupItem groupItem = (GroupItem) getGroup(groupPosition);
 
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -80,9 +85,11 @@ public class MyExpandableListViewAdapter extends BaseExpandableListAdapter {
         ImageView ivArrowIcon = convertView.findViewById(R.id.ivGroupArrowIcon);
         ImageView ivGroupSelectIcon = convertView.findViewById(R.id.ivGroupSelectIcon);
 
-        Boolean selectedAllBtnStatus = mViewModel.getSelectedAllBtnStatus().getValue();
-        if (selectedAllBtnStatus) {
+        String selectedAllBtnStatus = mViewModel.getSelectedAllBtnStatus().getValue();
+        if (Objects.equals(selectedAllBtnStatus, SELECT_ALL)) {
             groupItem.setSelected(true);
+        } else if (Objects.equals(selectedAllBtnStatus, NOT_SELECT_ANY)) {
+            groupItem.setSelected(false);
         }
 
         if (groupItem.isSelected()) {
@@ -94,6 +101,11 @@ public class MyExpandableListViewAdapter extends BaseExpandableListAdapter {
         ivGroupSelectIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (groupItem.isSelected()) {
+                    groupItem.setSelected(false);
+                } else {
+                    groupItem.setSelected(true);
+                }
 
             }
         });

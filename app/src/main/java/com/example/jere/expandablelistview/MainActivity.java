@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
@@ -15,6 +16,11 @@ import com.example.jere.expandablelistview.model.GroupItem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import static com.example.jere.expandablelistview.ExpandableListViewModel.NOT_SELECT_ANY;
+import static com.example.jere.expandablelistview.ExpandableListViewModel.SELECT_ALL;
+import static com.example.jere.expandablelistview.ExpandableListViewModel.SELECT_SOME;
 
 /**
  * @author jere
@@ -25,17 +31,32 @@ public class MainActivity extends AppCompatActivity {
     private ExpandableListAdapter mExpandableListViewAdapter;
     private ExpandableListViewModel mExpandableListViewModel;
     private ImageView mSelectAllIV;
-    private Observer<Boolean> selectAllBtnObserver = new Observer<Boolean>() {
+    private Observer<String> selectAllBtnObserver = new Observer<String>() {
         @Override
-        public void onChanged(@Nullable Boolean aBoolean) {
-            if (aBoolean) {
-                mSelectAllIV.setImageResource(R.drawable.icon_list_selected);
-            } else {
-                mSelectAllIV.setImageResource(R.drawable.icon_list_unselect);
+        public void onChanged(@Nullable String selectAllBtnStatus) {
+            if (!TextUtils.isEmpty(selectAllBtnStatus)) {
+                if (Objects.equals(selectAllBtnStatus, SELECT_ALL)) {
+                    mSelectAllIV.setImageResource(R.drawable.icon_list_selected);
+                } else if (Objects.requireNonNull(selectAllBtnStatus).equals(NOT_SELECT_ANY)){
+                    mSelectAllIV.setImageResource(R.drawable.icon_list_unselect);
+                } else {
+                    mSelectAllIV.setImageResource(R.drawable.select_middle_icon);
+                }
+                ((MyExpandableListViewAdapter) mExpandableListViewAdapter).notifyDataSetChanged();
             }
-            ((MyExpandableListViewAdapter) mExpandableListViewAdapter).notifyDataSetChanged();
         }
     };
+
+//    private Observer<List<Boolean>> groupSelectStatusListObserver = new Observer<List<Boolean>>() {
+//        @Override
+//        public void onChanged(@Nullable List<Boolean> groupSelectStatusList) {
+//            if (groupSelectStatusList != null) {
+//                List<Integer> selectedIdsList = new ArrayList<>();
+//
+//                mExpandableListViewModel.saveGroupSelectedIdsList();
+//            }
+//        }
+//    };
 
     private List<Integer> getGroupItemsSelectedIdsList() {
         List<Integer> groupItemSelectedIdList = new ArrayList<>();
@@ -83,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
         mExpandableListViewModel = ViewModelProviders.of(this).get(ExpandableListViewModel.class);
         mExpandableListViewModel.getSelectedAllBtnStatus().observe(this, selectAllBtnObserver);
         mExpandableListViewModel.initGroupExpandStatusList();
+//        mExpandableListViewModel.getGroupSelectedStatusList().observe(this, groupSelectStatusListObserver);
 
 
         List<GroupItem> groupListData = mExpandableListViewModel.getDummyGroupListData();
@@ -114,10 +136,10 @@ public class MainActivity extends AppCompatActivity {
         mSelectAllIV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mExpandableListViewModel.getSelectedAllBtnStatus().getValue()) {
-                    mExpandableListViewModel.setSelectedAllBtnStatus(false);
+                if (Objects.equals(mExpandableListViewModel.getSelectedAllBtnStatus().getValue(), SELECT_ALL)) {
+                    mExpandableListViewModel.setSelectedAllBtnStatus(NOT_SELECT_ANY);
                 } else {
-                    mExpandableListViewModel.setSelectedAllBtnStatus(true);
+                    mExpandableListViewModel.setSelectedAllBtnStatus(SELECT_ALL);
                 }
             }
         });

@@ -17,11 +17,15 @@ import java.util.List;
  * @author jere
  */
 public class ExpandableListViewModel extends AndroidViewModel {
+    public static final String SELECT_ALL = "SELECT_ALL";
+    public static final String SELECT_SOME = "SELECT_SOME";
+    public static final String NOT_SELECT_ANY = "NOT_SELECT_ANY";
+
     private ExpandableListRepository mRepository;
     private MutableLiveData<List<Boolean>> mGroupExpandStatusList;
     private MutableLiveData<List<Boolean>> mGroupSelectedStatusList;
     private MutableLiveData<List<Boolean>> mChildSelectedStatusList;
-    private MutableLiveData<Boolean> mSelectedAllBtnStatus;
+    private MutableLiveData<String> mSelectedAllBtnStatus;
 
     public ExpandableListViewModel(@NonNull Application application) {
         super(application);
@@ -30,7 +34,7 @@ public class ExpandableListViewModel extends AndroidViewModel {
         mGroupSelectedStatusList = new MutableLiveData<>();
         mChildSelectedStatusList = new MutableLiveData<>();
         mSelectedAllBtnStatus = new MutableLiveData<>();
-        mSelectedAllBtnStatus.postValue(false);
+        mSelectedAllBtnStatus.postValue(NOT_SELECT_ANY);
     }
 
     public MutableLiveData<List<Boolean>> getGroupExpandStatusList() {
@@ -70,21 +74,20 @@ public class ExpandableListViewModel extends AndroidViewModel {
         this.mChildSelectedStatusList.postValue(childSelectedStatusList);
     }
 
-    public MutableLiveData<Boolean> getSelectedAllBtnStatus() {
+    public MutableLiveData<String> getSelectedAllBtnStatus() {
         return mSelectedAllBtnStatus;
     }
 
-    public void setSelectedAllBtnStatus(Boolean isSelectedAll) {
-        this.mSelectedAllBtnStatus.postValue(isSelectedAll);
+    public void setSelectedAllBtnStatus(String selectedStatus) {
+        this.mSelectedAllBtnStatus.postValue(selectedStatus);
     }
 
     public List<GroupItem> getDummyGroupListData() {
         return mRepository.getDummyGroupListData();
     }
 
-//    public HashMap<String, List<ChildItem>> getDummyChildMapData(List<GroupItem> groupListData) {
-//        return mRepository.getDummyChildMapData(groupListData);
-//    }
-
+    public void saveGroupSelectedIdsList(List<Integer> groupSelectedIdsList) {
+        mRepository.saveGroupSelectedIdsList(groupSelectedIdsList);
+    }
 
 }

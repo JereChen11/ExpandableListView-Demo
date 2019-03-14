@@ -2,18 +2,22 @@ package com.example.jere.expandablelistview;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.TextUtils;
 
 import com.example.jere.expandablelistview.model.ChildItem;
 import com.example.jere.expandablelistview.model.GroupItem;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.StringTokenizer;
 
 public class ExpandableListRepository {
     private Context mContext;
     private static ExpandableListRepository mExpandableListRepository;
     private SharedPreferences mPreferences;
+    private final static String KEY_GROUP_SELECT_IDS = "KEY_GROUP_SELECT_IDS";
 
 
     public static ExpandableListRepository getRepository(Context context) {
@@ -30,6 +34,29 @@ public class ExpandableListRepository {
     public ExpandableListRepository(Context context) {
         mContext = context;
         mPreferences = context.getApplicationContext().getSharedPreferences("expandable_list_preference", Context.MODE_PRIVATE);
+    }
+
+    public void saveGroupSelectedIdsList(List<Integer> groupSelectedIdsList) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        StringBuilder groupSelectedIdString = new StringBuilder();
+        for (Integer id : groupSelectedIdsList) {
+            groupSelectedIdString.append(id).append(',');
+        }
+        editor.putString(KEY_GROUP_SELECT_IDS, groupSelectedIdString.toString());
+        editor.apply();
+    }
+
+    public List<Integer> getGroupSelectedIdsList() {
+        String groupSelectedIdsString = mPreferences.getString(KEY_GROUP_SELECT_IDS, "");
+        List<Integer> groupSelectedIdsList = new ArrayList<>();
+        if (!TextUtils.isEmpty(groupSelectedIdsString)) {
+            StringTokenizer selectedPrefsTokenizer = new StringTokenizer(groupSelectedIdsString, ",");
+            while (selectedPrefsTokenizer.hasMoreTokens()) {
+                int id = Integer.parseInt(selectedPrefsTokenizer.nextToken());
+                groupSelectedIdsList.add(id);
+            }
+        }
+        return groupSelectedIdsList;
     }
 
     public List<GroupItem> getDummyGroupListData() {
