@@ -15,11 +15,16 @@ import java.util.StringTokenizer;
  */
 public class ExpandableListRepository {
 
-    private Context mContext;
-    private static ExpandableListRepository mExpandableListRepository;
-    private SharedPreferences mPreferences;
     private final static String KEY_GROUP_SELECT_IDS = "KEY_GROUP_SELECT_IDS";
     private final static String KEY_CHILD_SELECT_IDS = "KEY_CHILD_SELECT_IDS";
+    private static ExpandableListRepository mExpandableListRepository;
+    private Context mContext;
+    private SharedPreferences mPreferences;
+
+    public ExpandableListRepository(Context context) {
+        mContext = context;
+        mPreferences = context.getApplicationContext().getSharedPreferences("expandable_list_preference", Context.MODE_PRIVATE);
+    }
 
     public static ExpandableListRepository getRepository(Context context) {
         if (mExpandableListRepository == null) {
@@ -30,11 +35,6 @@ public class ExpandableListRepository {
             }
         }
         return mExpandableListRepository;
-    }
-
-    public ExpandableListRepository(Context context) {
-        mContext = context;
-        mPreferences = context.getApplicationContext().getSharedPreferences("expandable_list_preference", Context.MODE_PRIVATE);
     }
 
     public void saveGroupSelectedIdsList(List<Integer> groupSelectedIdsList) {
@@ -50,7 +50,7 @@ public class ExpandableListRepository {
     public void saveChildSelectedIdsList(List<Integer> childSelectedIdsList) {
         SharedPreferences.Editor editor = mPreferences.edit();
         StringBuilder childSelectedIdSB = new StringBuilder();
-        for (Integer id: childSelectedIdsList) {
+        for (Integer id : childSelectedIdsList) {
             childSelectedIdSB.append(id).append(',');
         }
         editor.putString(KEY_CHILD_SELECT_IDS, childSelectedIdSB.toString());

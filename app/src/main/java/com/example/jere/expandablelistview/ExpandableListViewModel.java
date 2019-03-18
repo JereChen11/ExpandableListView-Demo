@@ -5,7 +5,6 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 
-import com.example.jere.expandablelistview.model.ChildItem;
 import com.example.jere.expandablelistview.model.GroupItem;
 
 import org.json.JSONArray;
@@ -13,8 +12,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -46,16 +43,16 @@ public class ExpandableListViewModel extends AndroidViewModel {
     }
 
     public void initGroupExpandStatusList() {
-       List<GroupItem> groupItemList = getDummyGroupListData();
-       List<Boolean> groupItemStatusList = new ArrayList<>();
-       for (GroupItem groupItem : groupItemList) {
-           if (groupItem.isSelected()) {
-               groupItemStatusList.add(true);
-           } else {
-               groupItemStatusList.add(false);
-           }
-       }
-       setGroupExpandStatusList(groupItemStatusList);
+        List<GroupItem> groupItemList = getDummyGroupListData();
+        List<Boolean> groupItemStatusList = new ArrayList<>();
+        for (GroupItem groupItem : groupItemList) {
+            if (groupItem.isSelected()) {
+                groupItemStatusList.add(true);
+            } else {
+                groupItemStatusList.add(false);
+            }
+        }
+        setGroupExpandStatusList(groupItemStatusList);
     }
 
     public MutableLiveData<String> getSelectedAllBtnStatus() {

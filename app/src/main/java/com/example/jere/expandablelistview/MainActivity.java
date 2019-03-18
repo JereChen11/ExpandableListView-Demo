@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         findView();
-
+        
         mExpandableListViewModel = ViewModelProviders.of(this).get(ExpandableListViewModel.class);
         mExpandableListViewModel.getSelectedAllBtnStatus().observe(this, selectAllBtnObserver);
         mExpandableListViewModel.initGroupExpandStatusList();
@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
         if (selectAllBtnStatus != null) {
             if (selectAllBtnStatus.equals(SELECT_ALL) || selectAllBtnStatus.equals(SELECT_SOME)) {
                 setToEnable = true;
-            } else if (selectAllBtnStatus.equals(NOT_SELECT_ANY)){
+            } else if (selectAllBtnStatus.equals(NOT_SELECT_ANY)) {
                 setToEnable = false;
             }
         }
