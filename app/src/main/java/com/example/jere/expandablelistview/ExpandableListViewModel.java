@@ -8,6 +8,10 @@ import android.support.annotation.NonNull;
 import com.example.jere.expandablelistview.model.ChildItem;
 import com.example.jere.expandablelistview.model.GroupItem;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,16 +27,12 @@ public class ExpandableListViewModel extends AndroidViewModel {
 
     private ExpandableListRepository mRepository;
     private MutableLiveData<List<Boolean>> mGroupExpandStatusList;
-    private MutableLiveData<List<Boolean>> mGroupSelectedStatusList;
-    private MutableLiveData<List<Boolean>> mChildSelectedStatusList;
     private MutableLiveData<String> mSelectedAllBtnStatus;
 
     public ExpandableListViewModel(@NonNull Application application) {
         super(application);
         mRepository = ExpandableListRepository.getRepository(application);
         mGroupExpandStatusList = new MutableLiveData<>();
-        mGroupSelectedStatusList = new MutableLiveData<>();
-        mChildSelectedStatusList = new MutableLiveData<>();
         mSelectedAllBtnStatus = new MutableLiveData<>();
         mSelectedAllBtnStatus.postValue(NOT_SELECT_ANY);
     }
@@ -58,22 +58,6 @@ public class ExpandableListViewModel extends AndroidViewModel {
        setGroupExpandStatusList(groupItemStatusList);
     }
 
-    public MutableLiveData<List<Boolean>> getGroupSelectedStatusList() {
-        return mGroupSelectedStatusList;
-    }
-
-    public void setGroupSelectedStatusList(List<Boolean> groupSelectedStatusList) {
-        this.mGroupSelectedStatusList.postValue(groupSelectedStatusList);
-    }
-
-    public MutableLiveData<List<Boolean>> getChildSelectedStatusList() {
-        return mChildSelectedStatusList;
-    }
-
-    public void setChildSelectedStatusList(List<Boolean> childSelectedStatusList) {
-        this.mChildSelectedStatusList.postValue(childSelectedStatusList);
-    }
-
     public MutableLiveData<String> getSelectedAllBtnStatus() {
         return mSelectedAllBtnStatus;
     }
@@ -83,11 +67,36 @@ public class ExpandableListViewModel extends AndroidViewModel {
     }
 
     public List<GroupItem> getDummyGroupListData() {
-        return mRepository.getDummyGroupListData();
+        List<GroupItem> groupItemList = new ArrayList<>();
+
+        String jsonString = mRepository.loadJSONFromAsset(getApplication());
+        JSONArray jsonArray = null;
+        try {
+            jsonArray = new JSONArray(jsonString);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject jsonObject = jsonArray.optJSONObject(i);
+            groupItemList.add(new GroupItem(jsonObject));
+        }
+        return groupItemList;
     }
 
     public void saveGroupSelectedIdsList(List<Integer> groupSelectedIdsList) {
         mRepository.saveGroupSelectedIdsList(groupSelectedIdsList);
+    }
+
+    public List<Integer> getGroupSelectedIdsList() {
+        return mRepository.getGroupSelectedIdsList();
+    }
+
+    public void saveChildSelectedIdsList(List<Integer> childSelectedIdsList) {
+        mRepository.saveChildSelectedIdsList(childSelectedIdsList);
+    }
+
+    public List<Integer> getChildSelectedIdsList() {
+        return mRepository.getChildSelectedIdsList();
     }
 
 }

@@ -11,6 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/rlSelectAll"
+        app:layout_constraintTop_toTopOf="parent"
         >
 
         <TextView
@@ -21,7 +22,7 @@
             android:gravity="center_vertical"
             android:layout_toEndOf="@id/ivChildIcon"
             android:maxLines="3"
-            android:text="child item name"
+            android:text="Select All Btn"
             android:textColor="@color/DarkOrange"
             android:textSize="16sp" />
 
@@ -45,15 +46,26 @@
 
     </RelativeLayout>
 
+    <Button
+        android:id="@+id/btnSubmit"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/DarkOrange"
+        android:text="Submit"
+        android:textAllCaps="false"
+        android:textSize="25sp"
+        android:textColor="@color/Black"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
     <ExpandableListView
         android:id="@+id/elv"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:groupIndicator="@null"
         android:childDivider="@color/Beige"
-        app:layout_constraintTop_toBottomOf="@id/rlSelectAll">
+        app:layout_constraintTop_toBottomOf="@id/rlSelectAll"
+        app:layout_constraintBottom_toTopOf="@+id/btnSubmit">
 
     </ExpandableListView>
-
 
 </android.support.constraint.ConstraintLayout>

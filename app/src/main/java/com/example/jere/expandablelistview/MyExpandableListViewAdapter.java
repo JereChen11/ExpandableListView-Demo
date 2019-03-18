@@ -6,13 +6,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.jere.expandablelistview.model.ChildItem;
 import com.example.jere.expandablelistview.model.GroupItem;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -25,34 +25,34 @@ import static com.example.jere.expandablelistview.ExpandableListViewModel.SELECT
  */
 public class MyExpandableListViewAdapter extends BaseExpandableListAdapter {
     private Context mContext;
-    private List<GroupItem> mParentListData;
+    private List<GroupItem> mGroupListData;
     private ExpandableListViewModel mViewModel;
 
     public MyExpandableListViewAdapter(Context context, @Nullable List<GroupItem> groupListData,
                                        @Nullable ExpandableListViewModel mExpandableListViewModel) {
         this.mContext = context;
-        this.mParentListData = groupListData;
+        this.mGroupListData = groupListData;
         this.mViewModel = mExpandableListViewModel;
     }
 
     @Override
     public int getGroupCount() {
-        return mParentListData.size();
+        return mGroupListData.size();
     }
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        return mParentListData.get(groupPosition).getChildItemList().size();
+        return mGroupListData.get(groupPosition).getChildItemList().size();
     }
 
     @Override
     public Object getGroup(int groupPosition) {
-        return mParentListData.get(groupPosition);
+        return mGroupListData.get(groupPosition);
     }
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
-        return mParentListData.get(groupPosition).getChildItemList().get(childPosition);
+        return mGroupListData.get(groupPosition).getChildItemList().get(childPosition);
     }
 
     @Override
@@ -72,12 +72,20 @@ public class MyExpandableListViewAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-
         final GroupItem groupItem = (GroupItem) getGroup(groupPosition);
+
+        List<Boolean> listAdapterGroupExpandStatusList = mViewModel.getGroupExpandStatusList().getValue();
+        ExpandableListView expandableListView = (ExpandableListView) parent;
+        if (listAdapterGroupExpandStatusList != null) {
+            isExpanded = listAdapterGroupExpandStatusList.get(groupPosition);
+        }
+        if (isExpanded) {
+            expandableListView.expandGroup(groupPosition);
+        }
 
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.elv_group_list_item , null);
+            convertView = inflater.inflate(R.layout.elv_group_list_item, null);
         }
         TextView textView = convertView.findViewById(R.id.tvGroupName);
         textView.setText(groupItem.getName());
@@ -88,12 +96,22 @@ public class MyExpandableListViewAdapter extends BaseExpandableListAdapter {
         String selectedAllBtnStatus = mViewModel.getSelectedAllBtnStatus().getValue();
         if (Objects.equals(selectedAllBtnStatus, SELECT_ALL)) {
             groupItem.setSelected(true);
+            for (ChildItem childItem : groupItem.getChildItemList()) {
+                childItem.setSelected(true);
+            }
         } else if (Objects.equals(selectedAllBtnStatus, NOT_SELECT_ANY)) {
             groupItem.setSelected(false);
+            for (ChildItem childItem : groupItem.getChildItemList()) {
+                childItem.setSelected(false);
+            }
         }
 
         if (groupItem.isSelected()) {
-            ivGroupSelectIcon.setImageResource(R.drawable.icon_list_selected);
+            if (isSelectAllChildItems(groupItem.getChildItemList())) {
+                ivGroupSelectIcon.setImageResource(R.drawable.icon_list_selected);
+            } else {
+                ivGroupSelectIcon.setImageResource(R.drawable.icon_list_unselect);
+            }
         } else {
             ivGroupSelectIcon.setImageResource(R.drawable.icon_list_unselect);
         }
@@ -103,16 +121,36 @@ public class MyExpandableListViewAdapter extends BaseExpandableListAdapter {
             public void onClick(View v) {
                 if (groupItem.isSelected()) {
                     groupItem.setSelected(false);
+
+                    for (ChildItem childItem : groupItem.getChildItemList()) {
+                        childItem.setSelected(false);
+                    }
+
+                    if (isNotSelectedAnyGroupItem(mGroupListData)) {
+                        mViewModel.setSelectedAllBtnStatus(NOT_SELECT_ANY);
+                    } else {
+                        mViewModel.setSelectedAllBtnStatus(SELECT_SOME);
+                    }
                 } else {
                     groupItem.setSelected(true);
-                }
 
+                    for (ChildItem childItem : groupItem.getChildItemList()) {
+                        childItem.setSelected(true);
+                    }
+
+                    if (isSelectedAllGroupItems(mGroupListData)) {
+                        mViewModel.setSelectedAllBtnStatus(SELECT_ALL);
+                    } else {
+                        mViewModel.setSelectedAllBtnStatus(SELECT_SOME);
+                    }
+                }
+                notifyDataSetChanged();
             }
         });
 
-        if(isExpanded) {
+        if (isExpanded) {
             ivArrowIcon.setImageResource(R.drawable.up_arrow_icon);
-        }else{
+        } else {
             ivArrowIcon.setImageResource(R.drawable.down_arrow_icon);
         }
 
@@ -121,22 +159,55 @@ public class MyExpandableListViewAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        ChildItem childItem = (ChildItem) getChild(groupPosition, childPosition);
+        final ChildItem childItem = (ChildItem) getChild(groupPosition, childPosition);
+        final GroupItem groupItem = (GroupItem) getGroup(groupPosition);
 
-        if(convertView == null) {
-            LayoutInflater inflater = (LayoutInflater)this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        if (convertView == null) {
+            LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.elv_child_list_item, null);
         }
 
-        TextView textChild = (TextView)convertView.findViewById(R.id.tvChildName);
+        TextView textChild = (TextView) convertView.findViewById(R.id.tvChildName);
         ImageView ivChildSelectIcon = (ImageView) convertView.findViewById(R.id.ivChildSelectIcon);
         textChild.setText(childItem.getName());
 
-//        if (childItem.isSelected()) {
-//            ivChildSelectIcon.setImageResource(R.drawable.icon_list_selected);
-//        } else {
-//            ivChildSelectIcon.setImageResource(R.drawable.icon_list_unselect);
-//        }
+        if (childItem.isSelected()) {
+            ivChildSelectIcon.setImageResource(R.drawable.icon_list_selected);
+        } else {
+            ivChildSelectIcon.setImageResource(R.drawable.icon_list_unselect);
+        }
+
+        ivChildSelectIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (childItem.isSelected()) {
+                    childItem.setSelected(false);
+
+                    if (isNotSelectedAnyChildItems(groupItem.getChildItemList())) {
+                        groupItem.setSelected(false);
+                    }
+
+                    if (isNotSelectedAnyGroupItem(mGroupListData)) {
+                        mViewModel.setSelectedAllBtnStatus(NOT_SELECT_ANY);
+                    } else {
+                        mViewModel.setSelectedAllBtnStatus(SELECT_SOME);
+                    }
+                } else {
+                    childItem.setSelected(true);
+
+                    if (isSelectAllChildItems(groupItem.getChildItemList())) {
+                        groupItem.setSelected(true);
+                    }
+
+                    if (isSelectedAllGroupItems(mGroupListData)) {
+                        mViewModel.setSelectedAllBtnStatus(SELECT_ALL);
+                    } else {
+                        mViewModel.setSelectedAllBtnStatus(SELECT_SOME);
+                    }
+                }
+                notifyDataSetChanged();
+            }
+        });
 
         return convertView;
     }
@@ -149,5 +220,41 @@ public class MyExpandableListViewAdapter extends BaseExpandableListAdapter {
     @Override
     public void notifyDataSetChanged() {
         super.notifyDataSetChanged();
+    }
+
+    private Boolean isNotSelectedAnyGroupItem(List<GroupItem> groupItemsList) {
+        for (GroupItem groupItem : groupItemsList) {
+            if (groupItem.isSelected()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private Boolean isSelectedAllGroupItems(List<GroupItem> groupItemsList) {
+        for (GroupItem groupItem : groupItemsList) {
+            if (!groupItem.isSelected()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private Boolean isNotSelectedAnyChildItems(List<ChildItem> childItemList) {
+        for (ChildItem childItem : childItemList) {
+            if (childItem.isSelected()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private Boolean isSelectAllChildItems(List<ChildItem> childItemList) {
+        for (ChildItem childItem : childItemList) {
+            if (!childItem.isSelected()) {
+                return false;
+            }
+        }
+        return true;
     }
 }

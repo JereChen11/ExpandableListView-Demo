@@ -4,21 +4,22 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
 
-import com.example.jere.expandablelistview.model.ChildItem;
-import com.example.jere.expandablelistview.model.GroupItem;
-
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
 
+/**
+ * @author jere
+ */
 public class ExpandableListRepository {
+
     private Context mContext;
     private static ExpandableListRepository mExpandableListRepository;
     private SharedPreferences mPreferences;
     private final static String KEY_GROUP_SELECT_IDS = "KEY_GROUP_SELECT_IDS";
-
+    private final static String KEY_CHILD_SELECT_IDS = "KEY_CHILD_SELECT_IDS";
 
     public static ExpandableListRepository getRepository(Context context) {
         if (mExpandableListRepository == null) {
@@ -38,11 +39,21 @@ public class ExpandableListRepository {
 
     public void saveGroupSelectedIdsList(List<Integer> groupSelectedIdsList) {
         SharedPreferences.Editor editor = mPreferences.edit();
-        StringBuilder groupSelectedIdString = new StringBuilder();
+        StringBuilder groupSelectedIdSB = new StringBuilder();
         for (Integer id : groupSelectedIdsList) {
-            groupSelectedIdString.append(id).append(',');
+            groupSelectedIdSB.append(id).append(',');
         }
-        editor.putString(KEY_GROUP_SELECT_IDS, groupSelectedIdString.toString());
+        editor.putString(KEY_GROUP_SELECT_IDS, groupSelectedIdSB.toString());
+        editor.apply();
+    }
+
+    public void saveChildSelectedIdsList(List<Integer> childSelectedIdsList) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        StringBuilder childSelectedIdSB = new StringBuilder();
+        for (Integer id: childSelectedIdsList) {
+            childSelectedIdSB.append(id).append(',');
+        }
+        editor.putString(KEY_CHILD_SELECT_IDS, childSelectedIdSB.toString());
         editor.apply();
     }
 
@@ -59,33 +70,33 @@ public class ExpandableListRepository {
         return groupSelectedIdsList;
     }
 
-    public List<GroupItem> getDummyGroupListData() {
-        ChildItem childItemOne = new ChildItem(100, "Child-Item-One");
-        ChildItem childItemTwo = new ChildItem(101, "Child-Item-Two");
-        ChildItem childItemThree = new ChildItem(102, "Child-Item-Three");
-        List<ChildItem> childItemsListData = Arrays.asList(childItemOne, childItemTwo, childItemThree);
-
-        GroupItem groupItemOne = new GroupItem(0, "Group-Item-One", childItemsListData);
-        GroupItem groupItemTwo = new GroupItem(1, "Group-Item-Two", childItemsListData);
-        GroupItem groupItemThree = new GroupItem(2, "Group-Item-Three", childItemsListData);
-        GroupItem groupItemFour = new GroupItem(3, "Group-Item-Four", childItemsListData);
-        GroupItem groupItemFive = new GroupItem(4, "Group-Item-Five", childItemsListData);
-        return Arrays.asList(groupItemOne, groupItemTwo, groupItemThree, groupItemFour, groupItemFive);
+    public List<Integer> getChildSelectedIdsList() {
+        String childSelectedIdsString = mPreferences.getString(KEY_CHILD_SELECT_IDS, "");
+        List<Integer> childSelectedIdsList = new ArrayList<>();
+        if (!TextUtils.isEmpty(childSelectedIdsString)) {
+            StringTokenizer selectedPrefsTokenizer = new StringTokenizer(childSelectedIdsString, ",");
+            while (selectedPrefsTokenizer.hasMoreTokens()) {
+                int id = Integer.parseInt(selectedPrefsTokenizer.nextToken());
+                childSelectedIdsList.add(id);
+            }
+        }
+        return childSelectedIdsList;
     }
 
-//    public HashMap<String, List<ChildItem>> getDummyChildMapData(List<GroupItem> groupListData) {
-//        HashMap<String, List<ChildItem>> childMapData = new HashMap<>();
-//        for (int i = 0; i < groupListData.size(); i++) {
-//            ChildItem childItemOne = new ChildItem("Child-Item-One");
-//            ChildItem childItemTwo = new ChildItem("Child-Item-Two");
-//            ChildItem childItemThree = new ChildItem("Child-Item-Three");
-//
-//            List<ChildItem> childListData = Arrays.asList(childItemOne, childItemTwo, childItemThree);
-//
-//            String childMapDataKey = groupListData.get(i).getName();
-//            childMapData.put(childMapDataKey, childListData);
-//        }
-//        return childMapData;
-//    }
+    public String loadJSONFromAsset(Context context) {
+        String json = null;
+        try {
+            InputStream is = context.getAssets().open("dummyDataTest.json");
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return json;
+    }
 
 }

@@ -1,0 +1,178 @@
+[
+  {
+    "name": "Animal",
+    "id": 1,
+    "is_select": false,
+    "child_items_list": [
+      {
+        "child_item_name": "Pig",
+        "child_item_id": 101,
+        "child_is_select": false
+      },
+      {
+        "child_item_name": "Dog",
+        "child_item_id": 102,
+        "child_is_select": false
+      },
+      {
+        "child_item_name": "Dragon",
+        "child_item_id": 103,
+        "child_is_select": false
+      },
+      {
+        "child_item_name": "Tiger",
+        "child_item_id": 104,
+        "child_is_select": false
+      }
+    ]
+  },
+  {
+    "name": "Ball",
+    "id": 2,
+    "is_select": false,
+    "child_items_list": [
+      {
+        "child_item_name": "Football",
+        "child_item_id": 110,
+        "child_is_select": false
+      },
+      {
+        "child_item_name": "Basketball",
+        "child_item_id": 111,
+        "child_is_select": false
+      },
+      {
+        "child_item_name": "Rugby",
+        "child_item_id": 112,
+        "child_is_select": false
+      }
+    ]
+  },
+  {
+    "name": "Movie",
+    "id": 3,
+    "is_select": false,
+    "child_items_list": [
+      {
+        "child_item_name": "Fast & Furious",
+        "child_item_id": 120,
+        "child_is_select": false
+      },
+      {
+        "child_item_name": "Forrest Gump",
+        "child_item_id": 121,
+        "child_is_select": false
+      },
+      {
+        "child_item_name": "Iron Man",
+        "child_item_id": 122,
+        "child_is_select": false
+      },
+      {
+        "child_item_name": "Iron Man II",
+        "child_item_id": 123,
+        "child_is_select": false
+      },
+      {
+        "child_item_name": "Iron Man III",
+        "child_item_id": 124,
+        "child_is_select": false
+      },
+      {
+        "child_item_name": "Aquaman",
+        "child_item_id": 125,
+        "child_is_select": false
+      }
+    ]
+  },
+  {
+    "name": "Food",
+    "id": 4,
+    "is_select": false,
+    "child_items_list": [
+      {
+        "child_item_name": "Rice",
+        "child_item_id": 130,
+        "child_is_select": false
+      },
+      {
+        "child_item_name": "Chicken",
+        "child_item_id": 131,
+        "child_is_select": false
+      },
+      {
+        "child_item_name": "Steak",
+        "child_item_id": 132,
+        "child_is_select": false
+      },
+      {
+        "child_item_name": "Pizza",
+        "child_item_id": 133,
+        "child_is_select": false
+      }
+    ]
+  },
+  {
+    "name": "Drinks",
+    "id": 5,
+    "is_select": false,
+    "child_items_list": [
+      {
+        "child_item_name": "Milk",
+        "child_item_id": 140,
+        "child_is_select": false
+      },
+      {
+        "child_item_name": "Juice",
+        "child_item_id": 141,
+        "child_is_select": false
+      }
+    ]
+  },
+  {
+    "name": "vegetable",
+    "id": 6,
+    "is_select": false,
+    "child_items_list": [
+      {
+        "child_item_name": "broccoli",
+        "child_item_id": 150,
+        "child_is_select": false
+      }
+    ]
+  },
+  {
+    "name": "Toy",
+    "id": 7,
+    "is_select": false,
+    "child_items_list": [
+      {
+        "child_item_name": "remote controller car",
+        "child_item_id": 160,
+        "child_is_select": false
+      },
+      {
+        "child_item_name": "remote controller plane",
+        "child_item_id": 161,
+        "child_is_select": false
+      },
+      {
+        "child_item_name": "remote controller ship",
+        "child_item_id": 162,
+        "child_is_select": false
+      }
+    ]
+  },
+  {
+    "name": "Residence",
+    "id": 8,
+    "is_select": false,
+    "child_items_list": [
+      {
+        "child_item_name": "cottage",
+        "child_item_id": 170,
+        "child_is_select": false
+      }
+    ]
+  }
+]

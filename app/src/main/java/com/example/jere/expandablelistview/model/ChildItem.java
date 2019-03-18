@@ -1,5 +1,7 @@
 package com.example.jere.expandablelistview.model;
 
+import org.json.JSONObject;
+
 /**
  * @author jere
  */
@@ -8,9 +10,10 @@ public class ChildItem {
     private String mName;
     private Boolean isSelected;
 
-    public ChildItem(int id, String name) {
-        this.mId = id;
-        this.mName = name;
+    public ChildItem(JSONObject jsonObject) {
+        this.mId = jsonObject.optInt("child_item_id");
+        this.mName = jsonObject.optString("child_item_name");
+        this.isSelected = jsonObject.optBoolean("child_is_select");
     }
 
     public int getId() {
@@ -28,20 +31,4 @@ public class ChildItem {
     public void setSelected(Boolean selected) {
         isSelected = selected;
     }
-
-    //    public String getChildName() {
-//        return mChildName;
-//    }
-//
-//    public void setChildName(String mChildName) {
-//        this.mChildName = mChildName;
-//    }
-//
-//    public Boolean getChildItemSelected() {
-//        return isChildItemSelected;
-//    }
-//
-//    public void setChildItemSelected(Boolean isChildItemSelected) {
-//        isChildItemSelected = isChildItemSelected;
-//    }
 }
