@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -74,15 +73,6 @@ public class MyExpandableListViewAdapter extends BaseExpandableListAdapter {
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         final GroupItem groupItem = (GroupItem) getGroup(groupPosition);
 
-        List<Boolean> listAdapterGroupExpandStatusList = mViewModel.getGroupExpandStatusList().getValue();
-        ExpandableListView expandableListView = (ExpandableListView) parent;
-        if (listAdapterGroupExpandStatusList != null) {
-            isExpanded = listAdapterGroupExpandStatusList.get(groupPosition);
-        }
-        if (isExpanded) {
-            expandableListView.expandGroup(groupPosition);
-        }
-
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.elv_group_list_item, null);
@@ -119,9 +109,8 @@ public class MyExpandableListViewAdapter extends BaseExpandableListAdapter {
         ivGroupSelectIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (groupItem.isSelected()) {
+                if (groupItem.isSelected() && isSelectAllChildItems(groupItem.getChildItemList())) {
                     groupItem.setSelected(false);
-
                     for (ChildItem childItem : groupItem.getChildItemList()) {
                         childItem.setSelected(false);
                     }
@@ -138,7 +127,7 @@ public class MyExpandableListViewAdapter extends BaseExpandableListAdapter {
                         childItem.setSelected(true);
                     }
 
-                    if (isSelectedAllGroupItems(mGroupListData)) {
+                    if (isSelectedAllItems(mGroupListData)) {
                         mViewModel.setSelectedAllBtnStatus(SELECT_ALL);
                     } else {
                         mViewModel.setSelectedAllBtnStatus(SELECT_SOME);
@@ -187,19 +176,16 @@ public class MyExpandableListViewAdapter extends BaseExpandableListAdapter {
                         groupItem.setSelected(false);
                     }
 
-                    if (isNotSelectedAnyGroupItem(mGroupListData)) {
+                    if (isNotSelectedAnyItems(mGroupListData)) {
                         mViewModel.setSelectedAllBtnStatus(NOT_SELECT_ANY);
                     } else {
                         mViewModel.setSelectedAllBtnStatus(SELECT_SOME);
                     }
                 } else {
                     childItem.setSelected(true);
+                    groupItem.setSelected(true);
 
-                    if (isSelectAllChildItems(groupItem.getChildItemList())) {
-                        groupItem.setSelected(true);
-                    }
-
-                    if (isSelectedAllGroupItems(mGroupListData)) {
+                    if (isSelectedAllItems(mGroupListData)) {
                         mViewModel.setSelectedAllBtnStatus(SELECT_ALL);
                     } else {
                         mViewModel.setSelectedAllBtnStatus(SELECT_SOME);
@@ -252,6 +238,30 @@ public class MyExpandableListViewAdapter extends BaseExpandableListAdapter {
     private Boolean isSelectAllChildItems(List<ChildItem> childItemList) {
         for (ChildItem childItem : childItemList) {
             if (!childItem.isSelected()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private Boolean isSelectedAllItems(List<GroupItem> groupItemList) {
+        for (GroupItem groupItem : groupItemList) {
+            if (!groupItem.isSelected()) {
+                return false;
+            }
+            if (!isSelectAllChildItems(groupItem.getChildItemList())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private Boolean isNotSelectedAnyItems(List<GroupItem> groupItemList) {
+        for (GroupItem groupItem : groupItemList) {
+            if (groupItem.isSelected()) {
+                return false;
+            }
+            if (!isNotSelectedAnyChildItems(groupItem.getChildItemList())) {
                 return false;
             }
         }

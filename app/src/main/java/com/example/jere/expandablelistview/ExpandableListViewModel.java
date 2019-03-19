@@ -23,36 +23,13 @@ public class ExpandableListViewModel extends AndroidViewModel {
     public static final String NOT_SELECT_ANY = "NOT_SELECT_ANY";
 
     private ExpandableListRepository mRepository;
-    private MutableLiveData<List<Boolean>> mGroupExpandStatusList;
     private MutableLiveData<String> mSelectedAllBtnStatus;
 
     public ExpandableListViewModel(@NonNull Application application) {
         super(application);
         mRepository = ExpandableListRepository.getRepository(application);
-        mGroupExpandStatusList = new MutableLiveData<>();
         mSelectedAllBtnStatus = new MutableLiveData<>();
         mSelectedAllBtnStatus.postValue(NOT_SELECT_ANY);
-    }
-
-    public MutableLiveData<List<Boolean>> getGroupExpandStatusList() {
-        return mGroupExpandStatusList;
-    }
-
-    public void setGroupExpandStatusList(List<Boolean> groupExpandStatusList) {
-        this.mGroupExpandStatusList.postValue(groupExpandStatusList);
-    }
-
-    public void initGroupExpandStatusList() {
-        List<GroupItem> groupItemList = getDummyGroupListData();
-        List<Boolean> groupItemStatusList = new ArrayList<>();
-        for (GroupItem groupItem : groupItemList) {
-            if (groupItem.isSelected()) {
-                groupItemStatusList.add(true);
-            } else {
-                groupItemStatusList.add(false);
-            }
-        }
-        setGroupExpandStatusList(groupItemStatusList);
     }
 
     public MutableLiveData<String> getSelectedAllBtnStatus() {

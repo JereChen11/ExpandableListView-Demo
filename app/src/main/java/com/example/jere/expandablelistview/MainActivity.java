@@ -95,28 +95,11 @@ public class MainActivity extends AppCompatActivity {
         
         mExpandableListViewModel = ViewModelProviders.of(this).get(ExpandableListViewModel.class);
         mExpandableListViewModel.getSelectedAllBtnStatus().observe(this, selectAllBtnObserver);
-        mExpandableListViewModel.initGroupExpandStatusList();
 
         List<GroupItem> groupListData = mExpandableListViewModel.getDummyGroupListData();
         mExpandableListViewAdapter = new MyExpandableListViewAdapter(this, groupListData, mExpandableListViewModel);
 
         mExpandableListView.setAdapter(mExpandableListViewAdapter);
-
-        mExpandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-            @Override
-            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-                List<Boolean> groupExpandStatusList = mExpandableListViewModel.getGroupExpandStatusList().getValue();
-                if (groupExpandStatusList.get(groupPosition)) {
-                    groupExpandStatusList.set(groupPosition, false);
-                } else {
-                    groupExpandStatusList.set(groupPosition, true);
-                }
-                mExpandableListViewModel.setGroupExpandStatusList(groupExpandStatusList);
-                return false;
-            }
-        });
-
-
     }
 
     private void findView() {
